@@ -8,7 +8,8 @@
 void relerr(mpfr_t c, mpfr_t a, mpfr_t ad)
 {
 	mpfr_sub(c, a, ad, MPFR_RNDN);
-	mpfr_div(c, c, ad, MPFR_RNDN);
+	if(mpfr_cmp_ui(ad, 0UL) != 0)
+		mpfr_div(c, c, ad, MPFR_RNDN);
 	mpfr_abs(c, c, MPFR_RNDN);
 }
 
@@ -53,11 +54,11 @@ int main()
 	mpfr_prec_t prec, long_prec;
 	mpfr_t mp_myexp, mp_myexp_long, mp_x, mp_exp_long, mp_myexp_relerr, mp_myexp_long_relerr, mp_myexp_rf_relerr;
 
-	printf("Input prec in bits: "); scanf("%ld", &prec);
+	printf("Input prec in bits: "); while(scanf("%ld", &prec) < 1);
 	// printf("prec  = %ld\n", prec);
 	long_prec = (prec < 64) ? 256 : prec * 3;
 
-	printf("#terms : "); scanf("%d", &n);
+	printf("#terms : "); while(scanf("%d", &n) < 1);
 	// printf("#term = %d\n", n);
 
 	str_x_length = (int)ceil(log10(2.0) * prec);
@@ -66,7 +67,7 @@ int main()
 	mpfr_init2(mp_myexp, prec);
 	mpfr_inits2(long_prec, mp_myexp_long, mp_x, mp_exp_long, mp_myexp_relerr, mp_myexp_long_relerr, mp_myexp_rf_relerr, (mpfr_ptr)NULL);
 
-	printf("x = "); scanf("%s", str_x);
+	printf("x = "); while(scanf("%s", str_x) < 1);
 	mpfr_set_str(mp_x, str_x, 10, MPFR_RNDN);
 
 	mpfr_exp(mp_exp_long, mp_x, MPFR_RNDN);
