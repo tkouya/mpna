@@ -33,7 +33,7 @@ int main(void)
 	unsigned int dprec;
 
 	// a = sqrt(2) + sqrt(3) * I
-	// b = sqrt(3) - sqrt(5) * I
+	// b = -sqrt(5) + pi * I
 
 	dprec = (unsigned int)ceil(mpreal::get_default_prec() * log10(2.0));
 	cout << "prec in bits: " << mpreal::get_default_prec() << endl;

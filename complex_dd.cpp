@@ -28,7 +28,7 @@ int main(void)
 {
 	complex<dd_real> a, b, c;
 
-	// a = sqrt(2) + sqrt(3) * I
+	// a = sqrt(2)  + sqrt(3) * I
 	// b = -sqrt(5) + pi * I
 
 	a = complex<dd_real>(sqrt((dd_real)2), sqrt((dd_real)3));

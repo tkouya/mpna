@@ -28,8 +28,8 @@ int main(void)
 {
 	complex<qd_real> a, b, c;
 
-	// a = sqrt(2) + sqrt(3) * I
-	// b = sqrt(3) - sqrt(5) * I
+	// a = sqrt(2)  + sqrt(3) * I
+	// b = -sqrt(3) + pi * I
 
 	a = complex<qd_real>(sqrt((qd_real)2), sqrt((qd_real)3));
 	b = complex<qd_real>(-sqrt((qd_real)5), qd_real::_pi);
