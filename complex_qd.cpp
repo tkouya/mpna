@@ -1,3 +1,21 @@
+//******************************************************************************
+// complex_qd.cpp : Test program of quadruple-double complex
+// Copyright (C) 2019 Tomonori Kouya
+// 
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Lesser General Public License as published by the
+// Free Software Foundation, either version 3 of the License or any later
+// version.
+// 
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+// for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//******************************************************************************
 #include <iostream>
 #include <iomanip>
 #include <complex>
@@ -14,7 +32,7 @@ int main(void)
 	// b = sqrt(3) - sqrt(5) * I
 
 	a = complex<qd_real>(sqrt((qd_real)2), sqrt((qd_real)3));
-	b = complex<qd_real>(sqrt((qd_real)3), -sqrt((qd_real)5));
+	b = complex<qd_real>(-sqrt((qd_real)5), qd_real::_pi);
 
 	cout << "a = " << a << endl;
 	cout << "b = " << b << endl;
