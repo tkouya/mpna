@@ -1,5 +1,5 @@
 //******************************************************************************
-// cg_qd_real.cpp : Conjugate-gradient method with QD
+// cg_qd.cpp : Conjugate-gradient method with QD
 // Copyright (C) 2019 Tomonori Kouya
 // 
 // This program is free software: you can redistribute it and/or modify it
