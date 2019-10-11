@@ -67,6 +67,35 @@ double d_mynorm2(double x[], int dim)
 	return ret;
 }
 
+// mynorm1 : ||x||_1
+double d_mynorm1(double x[], int dim)
+{
+	int i;
+	double ret = 0.0;
+
+	for(i = 0; i < dim; i++)
+		ret += fabs(x[i]);
+
+	return ret;
+}
+
+// mynormi : ||x||_inf
+double d_mynormi(double x[], int dim)
+{
+	int i;
+	double ret, abs_x;
+
+	ret = fabs(x[0]);
+	for(i = 1; i < dim; i++)
+	{
+		abs_x = fabs(x[i]);
+		if(ret < abs_x)
+			ret = abs_x;
+	}
+
+	return ret;
+}
+
 // mycopy : x := y
 void d_mycopy(double x[], double y[], int dim)
 {
@@ -326,7 +355,6 @@ int mpfr_is_singular(mpfr_srcptr x)
 }
 
 /* generic code */
-// ret_dd[2] = ret_dd[high == 0], ret_dd[low == 1]
 void mpfr_get_dd (double ret_dd[2], mpfr_srcptr x, mpfr_rnd_t rnd_mode)
 {
 	//if (MPFR_UNLIKELY (MPFR_IS_SINGULAR (x)))
@@ -336,117 +364,95 @@ void mpfr_get_dd (double ret_dd[2], mpfr_srcptr x, mpfr_rnd_t rnd_mode)
 		ret_dd[0] = mpfr_get_d(x, rnd_mode);
 		ret_dd[1] = (double)0.0;
 	}
-  else /* now x is a normal non-zero number */
+	else /* now x is a normal non-zero number */
 	{
-      // long double r; /* result */
-      double s; /* part of result */
-      //MPFR_SAVE_EXPO_DECL (expo);
+		double s; /* part of result */
 
-      //MPFR_SAVE_EXPO_MARK (expo);
+		/* Assume double-double format (as found with the PowerPC ABI).
+		   The generic code below isn't used because numbers with
+		   precision > 106 would not be supported. */
+		s = mpfr_get_d (x, MPFR_RNDN); /* high part of x */
 
-//#if defined(HAVE_LDOUBLE_MAYBE_DOUBLE_DOUBLE)
-      //if (MPFR_LDBL_MANT_DIG == 106)
-      //{
-          /* Assume double-double format (as found with the PowerPC ABI).
-             The generic code below isn't used because numbers with
-             precision > 106 would not be supported. */
-          s = mpfr_get_d (x, MPFR_RNDN); /* high part of x */
-          /* Let's first consider special cases separately. The test for
-             infinity is really needed to avoid a NaN result. The test
-             for NaN is mainly for optimization. The test for 0 is useful
-             to get the correct sign (assuming mpfr_get_d supports signed
-             zeros on the implementation). */
-          //if (s == 0 || DOUBLE_ISNAN (s) || DOUBLE_ISINF (s))
-          if (s == 0 || isnan(s) || isinf(s))
-					{
-            // r = (long double) s;
-						ret_dd[0] = s;
-						ret_dd[1] = 0;
-					}
-          else
-					{
-              mpfr_t y, z;
+		/* Let's first consider special cases separately. The test for
+		   infinity is really needed to avoid a NaN result. The test
+		   for NaN is mainly for optimization. The test for 0 is useful
+		   to get the correct sign (assuming mpfr_get_d supports signed
+		   zeros on the implementation). */
+		if (s == 0 || isnan(s) || isinf(s))
+		{
+			ret_dd[0] = s;
+			ret_dd[1] = 0;
+		}
+		else
+		{
+			mpfr_t y, z;
 
-              mpfr_init2 (y, mpfr_get_prec (x));
-              mpfr_init2 (z, 53); /* keep the precision small */
-              mpfr_set_d (z, s, MPFR_RNDN);  /* exact */
+			mpfr_init2(y, mpfr_get_prec (x));
+			mpfr_init2(z, 53); /* keep the precision small */
+			mpfr_set_d(z, s, MPFR_RNDN);  /* exact */
 
-							// y := x - z = x - s
-              mpfr_sub (y, x, z, MPFR_RNDN); /* exact */
+			// y := x - z = x - s
+			mpfr_sub(y, x, z, MPFR_RNDN); /* exact */
 
-              /* Add the second part of y (in the correct rounding mode). */
-              //r = (long double) s + (long double) mpfr_get_d (y, rnd_mode);
-							ret_dd[0] = s;
-							ret_dd[1] = mpfr_get_d(y, rnd_mode);
-
-              mpfr_clear (z);
-              mpfr_clear (y);
-          }
-      //}
-      //MPFR_SAVE_EXPO_FREE (expo);
-      //return r;
-    }
+			/* Add the second part of y (in the correct rounding mode). */
+			ret_dd[0] = s;
+			ret_dd[1] = mpfr_get_d(y, rnd_mode);
+			
+			mpfr_clear(z);
+			mpfr_clear(y);
+		}
+	}
 }
 
 /* double-double code */
 int mpfr_set_dd (mpfr_ptr r, double d[2], mpfr_rnd_t rnd_mode)
 {
-  mpfr_t t, u;
-  int inexact, shift_exp;
-  double h, l;
-//  MPFR_SAVE_EXPO_DECL (expo);
+	mpfr_t t, u;
+	int inexact, shift_exp;
+	double h, l;
 
-  /* Check for NAN */
-  //ONGDOUBLE_NAN_ACTION (d, goto nan);
+	/* Check for NAN */
 	if(isnan(d[0])) goto nan;
 
-  /* Check for INF */
-//  if (d > MPFR_LDBL_MAX)
-  if (d[0] > DBL_MAX)
-    {
-      mpfr_set_inf (r, 1);
-      return 0;
-    }
-  //else if (d < -MPFR_LDBL_MAX)
-  else if (d[0] < -DBL_MAX)
-    {
-      mpfr_set_inf (r, -1);
-      return 0;
-    }
-  /* Check for ZERO */
-  else if (d[0] == 0.0)
-    return mpfr_set_d (r, (double) d[0], rnd_mode);
+	/* Check for INF */
+	if (d[0] > DBL_MAX)
+	{
+		mpfr_set_inf(r, 1);
+		return 0;
+	}
+	else if (d[0] < -DBL_MAX)
+	{
+		mpfr_set_inf(r, -1);
+		return 0;
+	}
+	/* Check for ZERO */
+	else if (d[0] == 0.0)
+	  return mpfr_set_d(r, (double) d[0], rnd_mode);
 
- // if (d >= (long double) MPFR_LDBL_MAX || d <= (long double) -MPFR_LDBL_MAX)
- //   h = (d >= (long double) MPFR_LDBL_MAX) ? MPFR_LDBL_MAX : -MPFR_LDBL_MAX;
-  if (d[0] >= DBL_MAX || d[0] <= -DBL_MAX)
-    h = (d[0] >= DBL_MAX) ? DBL_MAX : -DBL_MAX;
-  else
-    h = (double) d[0]; /* should not overflow */
-  //l = (double) (d - (long double) h);
+	if (d[0] >= DBL_MAX || d[0] <= -DBL_MAX)
+		h = (d[0] >= DBL_MAX) ? DBL_MAX : -DBL_MAX;
+	else
+		h = (double) d[0]; /* should not overflow */
+
 	l = d[1];
 
-  //MPFR_SAVE_EXPO_MARK (expo);
+	mpfr_init2(t, 53);
+	mpfr_init2(u, 53);
 
-  mpfr_init2 (t, 53);
-  mpfr_init2 (u, 53);
+	inexact = mpfr_set_d(t, h, MPFR_RNDN);
+	inexact = mpfr_set_d(u, l, MPFR_RNDN);
+	inexact = mpfr_add(r, t, u, rnd_mode);
 
-  inexact = mpfr_set_d (t, h, MPFR_RNDN);
-  //MPFR_ASSERTN(inexact == 0);
-  inexact = mpfr_set_d (u, l, MPFR_RNDN);
-  //MPFR_ASSERTN(inexact == 0);
-  inexact = mpfr_add (r, t, u, rnd_mode);
+	mpfr_clear (t);
+	mpfr_clear (u);
 
-  mpfr_clear (t);
-  mpfr_clear (u);
+	inexact = mpfr_check_range (r, inexact, rnd_mode);
 
-//  MPFR_SAVE_EXPO_FREE (expo);
-  inexact = mpfr_check_range (r, inexact, rnd_mode);
-  return inexact;
+	return inexact;
 
- nan:
-  mpfr_set_nan(r); //MPFR_SET_NAN(r);
-  //return MPFR_RET_NAN;
+nan:
+	mpfr_set_nan(r);
+
 	return 0;
 }
 
@@ -457,10 +463,8 @@ void mpfr_get_qd (double ret_qd[4], mpfr_srcptr x, mpfr_rnd_t rnd_mode)
 	int i;
 	double s;
 
-	//if (MPFR_UNLIKELY (MPFR_IS_SINGULAR (x)))
 	if (mpfr_is_singular(x))
 	{
-		//return (long double) mpfr_get_d (x, rnd_mode);
 		ret_qd[0] = mpfr_get_d(x, rnd_mode);
 		ret_qd[1] = (double)0.0;
 		ret_qd[2] = (double)0.0;
@@ -468,138 +472,125 @@ void mpfr_get_qd (double ret_qd[4], mpfr_srcptr x, mpfr_rnd_t rnd_mode)
 	}
 	else /* now x is a normal non-zero number */
 	{
-//#if defined(HAVE_LDOUBLE_MAYBE_DOUBLE_DOUBLE)
-      //if (MPFR_LDBL_MANT_DIG == 106)
-      //{
-          /* Assume double-double format (as found with the PowerPC ABI).
-             The generic code below isn't used because numbers with
-             precision > 106 would not be supported. */
-          s = mpfr_get_d (x, MPFR_RNDN); /* high part of x */
-          /* Let's first consider special cases separately. The test for
-             infinity is really needed to avoid a NaN result. The test
-             for NaN is mainly for optimization. The test for 0 is useful
-             to get the correct sign (assuming mpfr_get_d supports signed
-             zeros on the implementation). */
-          //if (s == 0 || DOUBLE_ISNAN (s) || DOUBLE_ISINF (s))
-          if (s == 0 || isnan(s) || isinf(s))
-					{
-            // r = (long double) s;
-						ret_qd[0] = s;
-						ret_qd[1] = 0;
-						ret_qd[1] = 0;
-						ret_qd[1] = 0;
-					}
-          else
-					{
-              mpfr_t y, z[3];
+		/* Assume double-double format (as found with the PowerPC ABI).
+			The generic code below isn't used because numbers with
+			precision > 106 would not be supported. */
+		s = mpfr_get_d(x, MPFR_RNDN); /* high part of x */
 
-              mpfr_init2 (y, mpfr_get_prec (x));
-              mpfr_init2 (z[0], 53); /* keep the precision small */
-              mpfr_init2 (z[1], 53); /* keep the precision small */
-              mpfr_init2 (z[2], 53); /* keep the precision small */
+		/* Let's first consider special cases separately. The test for
+		   infinity is really needed to avoid a NaN result. The test
+		   for NaN is mainly for optimization. The test for 0 is useful
+		   to get the correct sign (assuming mpfr_get_d supports signed
+		   zeros on the implementation). */
+		if (s == 0 || isnan(s) || isinf(s))
+		{
+			ret_qd[0] = s;
+			ret_qd[1] = 0;
+			ret_qd[1] = 0;
+			ret_qd[1] = 0;
+		}
+		else
+		{
+			mpfr_t y, z[3];
 
-							// y[0] := x - z = x - s
-              mpfr_set_d (z[0], s, MPFR_RNDN);  /* exact */
-              mpfr_sub (y, x, z[0], MPFR_RNDN); /* exact */
-							ret_qd[0] = s;
+			mpfr_init2(y, mpfr_get_prec (x));
+			mpfr_init2(z[0], 53); /* keep the precision small */
+			mpfr_init2(z[1], 53); /* keep the precision small */
+			mpfr_init2(z[2], 53); /* keep the precision small */
 
-							// y[1] := y[0] - z = x - s
- 		          s = mpfr_get_d (y, MPFR_RNDN); /* high part of y */
-	            mpfr_set_d (z[1], s, MPFR_RNDN);  /* exact */
-              mpfr_sub (y, x, z[0], MPFR_RNDN); /* exact */
-              mpfr_sub (y, y, z[1], MPFR_RNDN); /* exact */
-							ret_qd[1] = s;
+			// y[0] := x - z = x - s
+			mpfr_set_d(z[0], s, MPFR_RNDN);  /* exact */
+			mpfr_sub(y, x, z[0], MPFR_RNDN); /* exact */
+			ret_qd[0] = s;
 
-							// y[2] := y[1] - z = x - s
- 		          s = mpfr_get_d (y, MPFR_RNDN); /* high part of y */
-	            mpfr_set_d (z[2], s, MPFR_RNDN);  /* exact */
-              mpfr_sub (y, x, z[0], MPFR_RNDN); /* exact */
-              mpfr_sub (y, y, z[1], MPFR_RNDN); /* exact */
-              mpfr_sub (y, y, z[2], MPFR_RNDN); /* exact */
-							ret_qd[2] = s;
+			// y[1] := y[0] - z = x - s
+			s = mpfr_get_d(y, MPFR_RNDN); /* high part of y */
+			mpfr_set_d(z[1], s, MPFR_RNDN);  /* exact */
+			mpfr_sub(y, x, z[0], MPFR_RNDN); /* exact */
+			mpfr_sub(y, y, z[1], MPFR_RNDN); /* exact */
+			ret_qd[1] = s;
+			
+			// y[2] := y[1] - z = x - s
+			s = mpfr_get_d(y, MPFR_RNDN); /* high part of y */
+			mpfr_set_d(z[2], s, MPFR_RNDN);  /* exact */
+			mpfr_sub(y, x, z[0], MPFR_RNDN); /* exact */
+			mpfr_sub(y, y, z[1], MPFR_RNDN); /* exact */
+			mpfr_sub(y, y, z[2], MPFR_RNDN); /* exact */
+			ret_qd[2] = s;
 
-							// y[3] := x - z = x - s
-							ret_qd[3] = mpfr_get_d(y, rnd_mode);
+			// y[3] := x - z = x - s
+			ret_qd[3] = mpfr_get_d(y, rnd_mode);
 
-              mpfr_clear (z[0]);
-              mpfr_clear (z[1]);
-              mpfr_clear (z[2]);
-              mpfr_clear (y);
-          }
-      //}
-      //MPFR_SAVE_EXPO_FREE (expo);
-      //return r;
-    }
+			mpfr_clear(z[0]);
+			mpfr_clear(z[1]);
+			mpfr_clear(z[2]);
+			mpfr_clear(y);
+		}
+	}
 }
 
 /* double-double code */
 int mpfr_set_qd (mpfr_ptr r, double d[4], mpfr_rnd_t rnd_mode)
 {
-  mpfr_t t, u, v, w;
-  int inexact, shift_exp;
-  double h, l[3];
-//  MPFR_SAVE_EXPO_DECL (expo);
+	mpfr_t t, u, v, w;
+	int inexact, shift_exp;
+	double h, l[3];
 
-  /* Check for NAN */
-  //ONGDOUBLE_NAN_ACTION (d, goto nan);
+	/* Check for NAN */
 	if(isnan(d[0])) goto nan;
 
-  /* Check for INF */
-//  if (d > MPFR_LDBL_MAX)
-  if (d[0] > DBL_MAX)
-    {
-      mpfr_set_inf (r, 1);
-      return 0;
-    }
-  //else if (d < -MPFR_LDBL_MAX)
-  else if (d[0] < -DBL_MAX)
-    {
-      mpfr_set_inf (r, -1);
-      return 0;
-    }
-  /* Check for ZERO */
-  else if (d[0] == 0.0)
-    return mpfr_set_d (r, (double) d[0], rnd_mode);
+	/* Check for INF */
+	if (d[0] > DBL_MAX)
+	{
+		mpfr_set_inf (r, 1);
+		return 0;
+	}
+	else if (d[0] < -DBL_MAX)
+	{
+		mpfr_set_inf (r, -1);
+		return 0;
+	}
 
- // if (d >= (long double) MPFR_LDBL_MAX || d <= (long double) -MPFR_LDBL_MAX)
- //   h = (d >= (long double) MPFR_LDBL_MAX) ? MPFR_LDBL_MAX : -MPFR_LDBL_MAX;
-  if (d[0] >= DBL_MAX || d[0] <= -DBL_MAX)
-    h = (d[0] >= DBL_MAX) ? DBL_MAX : -DBL_MAX;
-  else
-    h = (double) d[0]; /* should not overflow */
-  //l = (double) (d - (long double) h);
+	/* Check for ZERO */
+	else if (d[0] == 0.0)
+    	return mpfr_set_d (r, (double) d[0], rnd_mode);
+
+	if (d[0] >= DBL_MAX || d[0] <= -DBL_MAX)
+		h = (d[0] >= DBL_MAX) ? DBL_MAX : -DBL_MAX;
+	else
+		h = (double) d[0]; /* should not overflow */
+
 	l[0] = d[1];
 	l[1] = d[2];
 	l[2] = d[3];
 
-  //MPFR_SAVE_EXPO_MARK (expo);
+	//MPFR_SAVE_EXPO_MARK (expo);
+	
+	mpfr_init2 (t, 53);
+	mpfr_init2 (u, 53);
+	mpfr_init2 (v, 53);
+	mpfr_init2 (w, 53);
 
-  mpfr_init2 (t, 53);
-  mpfr_init2 (u, 53);
-  mpfr_init2 (v, 53);
-  mpfr_init2 (w, 53);
+	inexact = mpfr_set_d (t, h, MPFR_RNDN);
+	inexact = mpfr_set_d (u, l[0], MPFR_RNDN);
+	inexact = mpfr_set_d (v, l[1], MPFR_RNDN);
+	inexact = mpfr_set_d (w, l[2], MPFR_RNDN);
 
-  inexact = mpfr_set_d (t, h, MPFR_RNDN);
-  inexact = mpfr_set_d (u, l[0], MPFR_RNDN);
-  inexact = mpfr_set_d (v, l[1], MPFR_RNDN);
-  inexact = mpfr_set_d (w, l[2], MPFR_RNDN);
+	inexact = mpfr_add (r, t, u, rnd_mode);
+	inexact = mpfr_add (r, r, v, rnd_mode);
+	inexact = mpfr_add (r, r, w, rnd_mode);
 
-  inexact = mpfr_add (r, t, u, rnd_mode);
-  inexact = mpfr_add (r, r, v, rnd_mode);
-  inexact = mpfr_add (r, r, w, rnd_mode);
+	mpfr_clear (t);
+	mpfr_clear (u);
+	mpfr_clear (v);
+	mpfr_clear (w);
 
-  mpfr_clear (t);
-  mpfr_clear (u);
-  mpfr_clear (v);
-  mpfr_clear (w);
+	inexact = mpfr_check_range (r, inexact, rnd_mode);
+	return inexact;
 
-//  MPFR_SAVE_EXPO_FREE (expo);
-  inexact = mpfr_check_range (r, inexact, rnd_mode);
-  return inexact;
+nan:
+	mpfr_set_nan(r); //MPFR_SET_NAN(r);
 
- nan:
-  mpfr_set_nan(r); //MPFR_SET_NAN(r);
-  //return MPFR_RET_NAN;
 	return 0;
 }
 
@@ -656,6 +647,45 @@ void mpfr_mynorm2(mpfr_t ret, mpfr_t x[], int dim)
 	mpfr_sqrt(ret, ret, _tk_default_rmode);
 
 	return;
+}
+
+// mynorm1 : ||x||_1
+void mpfr_mynorm1(mpfr_t ret, mpfr_t x[], int dim)
+{
+	int i;
+	mpfr_t abs_x;
+
+	mpfr_init2(abs_x, mpfr_get_prec(ret));
+
+	mpfr_set_ui(ret, 0UL, _tk_default_rmode);
+
+	for(i = 0; i < dim; i++)
+	{
+		mpfr_abs(abs_x, x[i], _tk_default_rmode);
+		mpfr_add(ret, ret, abs_x, _tk_default_rmode);
+	}
+
+	mpfr_clear(abs_x);
+}
+
+// mynormi : ||x||_inf
+void mpfr_mynormi(mpfr_t ret, mpfr_t x[], int dim)
+{
+	int i;
+	mpfr_t abs_x;
+
+	mpfr_init2(abs_x, mpfr_get_prec(ret));
+
+	mpfr_abs(ret, x[0], _tk_default_rmode);
+
+	for(i = 1; i < dim; i++)
+	{
+		mpfr_abs(abs_x, x[i], _tk_default_rmode);
+		if(mpfr_cmp(ret, abs_x) < 0)
+			mpfr_set(ret, abs_x, _tk_default_rmode);
+	}
+
+	mpfr_clear(abs_x);
 }
 
 // mycopy : x := y
