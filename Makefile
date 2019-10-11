@@ -141,11 +141,12 @@ cg: cg_d_omp.c cg_mpfr_omp.c get_sec cg_d.cpp cg_dd.cpp cg_qd.cpp cg_mpreal.cpp
 	$(CPP) $(QD_INC) cg_qd.cpp get_sec.o -o cg_qd_cxx $(QD_LIB)
 	$(CPP) $(MPFR_INC) cg_mpreal.cpp get_sec.o -o cg_mpreal_cxx $(MPFR_LIB)
 
-lu: lu_d.c lu_dd.cpp lu_qd.cpp lu_mpreal.cpp
+lu: lu_d.c template_lu_dd.cpp template_lu.cpp template_lu_qd.cpp template_lu_mpreal.cpp
 	$(CC) $(INC) lu_d.c get_sec.o -o lu_d $(LIB)
-	$(CPP) $(QD_INC) lu_dd.cpp get_sec.o -o lu_dd $(QD_LIB)
-	$(CPP) $(QD_INC) lu_qd.cpp get_sec.o -o lu_qd $(QD_LIB)
-	$(CPP) $(MPFR_INC) lu_mpreal.cpp get_sec.o -o lu_mpreal $(MPFR_LIB)
+	$(CC) $(INC) template_lu.cpp get_sec.o -o lu_d_cxx $(LIB)
+	$(CPP) $(QD_INC) template_lu_dd.cpp get_sec.o -o lu_dd $(QD_LIB)
+	$(CPP) $(QD_INC) template_lu_qd.cpp get_sec.o -o lu_qd $(QD_LIB)
+	$(CPP) $(MPFR_INC) template_lu_mpreal.cpp get_sec.o -o lu_mpreal $(MPFR_LIB)
 
 power: power_mpreal.cpp power_d.cpp power_mpreal_hilbert.cpp cond_mpreal_hilbert.cpp
 	$(CPP) $(MPFR_INC) power_d.cpp get_sec.o -o power_d $(MPFR_LIB)
