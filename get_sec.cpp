@@ -33,6 +33,9 @@
 
 #define DIVTIMES 2
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 //#define USE_CLOCK
 
 /* flag == 0: No print */
@@ -154,3 +157,6 @@ float fget_real_secv(void)
 {
 	return (float)get_real_sec(0);
 }
+#ifdef __cplusplus
+} // extern "C" {
+#endif // __cplusplus
