@@ -1,5 +1,5 @@
 //******************************************************************************
-// lu_dd.cpp : Direct method with MPFR C++ + MPFR/GMP
+// lu_mpreal.cpp : Direct method with MPFR C++ + MPFR/GMP
 // Copyright (C) 2019 Tomonori Kouya
 // 
 // This program is free software: you can redistribute it and/or modify it
