@@ -1,28 +1,40 @@
+//******************************************************************************
+// mpf_relerr.cpp : Print relative errors of basic arithmetic
+// Copyright (C) 2019 Tomonori Kouya
+// 
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Lesser General Public License as published by the
+// Free Software Foundation, either version 3 of the License or any later
+// version.
+// 
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+// for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// 
+//******************************************************************************
 #include <iostream>
 #include <iomanip>
 
 #include "gmpxx.h"
 
-/*
-[tkouya@cs-muse mpna]$ g++ mpf_relerr.cc -lgmpxx -lgmp
-[tkouya@cs-muse mpna]$ ./a.out
- 1.4142135623730950488016887242096980785690000e+00 +  1.7320508075688772935274463415058723669420000e+00 =  3.1462643699419723423291350657155704455110000e+00
- 1.4142135623730950488016887242096980785690000e+00 -  1.7320508075688772935274463415058723669420000e+00 = -3.1783724519578224472575761729617428837340000e-01
- 1.4142135623730950488016887242096980785690000e+00 *  1.7320508075688772935274463415058723669420000e+00 =  2.4494897427831780981972840747058913919640000e+00
- 1.4142135623730950488016887242096980785690000e+00 /  1.7320508075688772935274463415058723669420000e+00 =  8.1649658092772603273242802490196379732180000e-01
-*/
-
 using namespace std;
 
-// 相対誤差
+// relative error
 void relerr(mpf_class &c, mpf_class a, mpf_class ad)
 {
-	c = abs((a - ad) / ad);
+	if(ad == 0)
+		c = abs(a - ad);
+	else
+		c = abs((a - ad) / ad);
 }
 
 int main(void)
 {
-	unsigned long prec; // 精度
+	unsigned long prec; // precision
 
 	cout << " Input default prec in bits: "; cin >> prec;
 

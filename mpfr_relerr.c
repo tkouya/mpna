@@ -1,3 +1,21 @@
+//******************************************************************************
+// mpfr_relerr.c : Computation of Relative errors
+// Copyright (C) 2019 Tomonori Kouya
+// 
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Lesser General Public License as published by the
+// Free Software Foundation, either version 3 of the License or any later
+// version.
+// 
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+// for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//******************************************************************************
 #include <stdio.h>
 
 #include "mpfr.h"
@@ -5,7 +23,8 @@
 void relerr(mpfr_t c, mpfr_t a, mpfr_t ad)
 {
 	mpfr_sub(c, a, ad, MPFR_RNDN);
-	mpfr_div(c, c, ad, MPFR_RNDN);
+	if(mpfr_cmp_ui(ad, 0UL) != 0)
+		mpfr_div(c, c, ad, MPFR_RNDN);
 	mpfr_abs(c, c, MPFR_RNDN);
 }
 
@@ -15,7 +34,7 @@ int main()
 	mpfr_t a, b, c;
 	mpfr_t ad, bd, cd;
 
-	printf("Input prec in bits: "); scanf("%ld", &prec);
+	printf("Input prec in bits: "); while(scanf("%ld", &prec) < 1);
 
 	mpfr_set_default_prec(prec); // in bits
 
