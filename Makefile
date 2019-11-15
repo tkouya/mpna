@@ -62,16 +62,6 @@ gmp: mpn_sample_full.c  mpz_test.c mpz_input.c mpz_mersenne.c mpf_template.c mpz
 	$(CC) $(GMP_INC) mpq_input.c -o mpq_input $(GMP_LIB)
 	$(CC) $(GMP_INC) mpq_input_convert.c -o mpq_input_convert $(GMP_LIB)
 
-mpn_mul_n_benchmark: mpn_mul_n_benchmark.c
-	$(CC) $(GMP_INC) mpn_mul_n_benchmark.c -o mpn_mul_n_benchmark $(GMP_LIB)
-	$(CC) -DUSE_MPN_BASECASE $(INNER_GMP_INC) mpn_mul_n_benchmark.c -o mpn_mul_n_benchmark_basecase $(INNER_GMP_LIB)
-	$(CC) -DUSE_MPN_TOOM22 $(INNER_GMP_INC) mpn_mul_n_benchmark.c -o mpn_mul_n_benchmark_toom22 $(INNER_GMP_LIB)
-	$(CC) -DUSE_MPN_TOOM33 $(INNER_GMP_INC) mpn_mul_n_benchmark.c -o mpn_mul_n_benchmark_toom33 $(INNER_GMP_LIB)
-	$(CC) -DUSE_MPN_TOOM44 $(INNER_GMP_INC) mpn_mul_n_benchmark.c -o mpn_mul_n_benchmark_toom44 $(INNER_GMP_LIB)
-	$(CC) -DUSE_MPN_TOOM6h $(INNER_GMP_INC) mpn_mul_n_benchmark.c -o mpn_mul_n_benchmark_toom6h $(INNER_GMP_LIB)
-	$(CC) -DUSE_MPN_TOOM8h $(INNER_GMP_INC) mpn_mul_n_benchmark.c -o mpn_mul_n_benchmark_toom8h $(INNER_GMP_LIB)
-	$(CC) -DUSE_MPN_FFT $(INNER_GMP_INC) mpn_mul_n_benchmark.c -o mpn_mul_n_benchmark_fft $(INNER_GMP_LIB)
-
 gmp_class: mpf_template.cpp mpz_test.cpp mpz_mersenne.cpp mpz_input_nextprime.cpp mpz_prime_factorization.cpp mpz_input_gcd_lcm.cpp mpq_test.cpp
 	$(CPP) $(GMP_INC) mpf_template.cpp -o mpf_template_cxx $(GMPXX_LIB)
 	$(CPP) $(GMP_INC) mpz_mersenne.cpp -o mpz_mersenne_cxx $(GMPXX_LIB)
@@ -208,18 +198,7 @@ clean:
 	-rm mpz_mersenne_cxx
 	-rm mpz_factorial
 	-rm mpq_input
-	-rm mpn_mul_n_benchmark
-	-rm mpn_mul_n_benchmark_basecase
-	-rm mpn_mul_n_benchmark_toom22
-	-rm mpn_mul_n_benchmark_toom33
-	-rm mpn_mul_n_benchmark_toom44
-	-rm mpn_mul_n_benchmark_toom6h
-	-rm mpn_mul_n_benchmark_toom8h
-	-rm mpn_mul_n_benchmark_toomfft
-	-rm mpfr_pi
 	-rm mpfr_pi_simple
-	-rm mpn_sample
-	-rm sample_linear
 	-rm mpn_sample_full
 	-rm sample_linear_cxx
 	-rm mpz_input_str
