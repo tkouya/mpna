@@ -1,3 +1,7 @@
+# ------------------------------------------------
+# ----- Makefile for "Multiple Precision Numerical Computation"
+# ----- Copyright (c) 2019 Tomonori Kouya
+# ------------------------------------------------
 # GCC
 include gcc.inc
 
@@ -41,8 +45,7 @@ logistic: logistic_f.c logistic.c logistic_dd.cpp logistic_qd.cpp logistic_mprea
 get_sec: get_sec.cpp get_secv.h
 	$(CPP) -c get_sec.cpp -o get_sec.o
 
-gmp: mpn_sample.c mpn_sample_full.c  mpz_test.c mpz_input.c mpz_mersenne.c mpf_template.c mpz_factorial.c mpz_input_nextprime.c mpz_prime_factorization.c mpz_binomial.c mpz_input_gcd_lcm.c mpf_relerr.c mpq_input.c mpq_input_convert.c
-	$(CC) $(GMP_INC) mpn_sample.c -o mpn_sample $(GMP_LIB)
+gmp: mpn_sample_full.c  mpz_test.c mpz_input.c mpz_mersenne.c mpf_template.c mpz_factorial.c mpz_input_nextprime.c mpz_prime_factorization.c mpz_binomial.c mpz_input_gcd_lcm.c mpf_relerr.c mpq_input.c mpq_input_convert.c
 	$(CC) $(GMP_INC) mpn_sample_full.c -o mpn_sample_full $(GMP_LIB)
 	$(CC) $(GMP_INC) -DUSE_STR_INPUT mpz_input.c -o mpz_input_str $(GMP_LIB)
 	$(CC) $(GMP_INC) mpz_test.c -o mpz_test $(GMP_LIB)
@@ -50,8 +53,6 @@ gmp: mpn_sample.c mpn_sample_full.c  mpz_test.c mpz_input.c mpz_mersenne.c mpf_t
 	$(CC) $(GMP_INC) mpz_mersenne.c -o mpz_mersenne $(GMP_LIB)
 	$(CC) $(GMP_INC) mpz_factorial.c -o mpz_factorial $(GMP_LIB)
 	$(CC) $(GMP_INC) mpf_template.c -o mpf_template $(GMP_LIB)
-	$(CC) $(GMP_INC) mpf_template2.c -o mpf_template2 $(GMP_LIB)
-	$(CC) $(GMP_INC) mpf_template3.c -o mpf_template3 $(GMP_LIB)
 	$(CC) $(GMP_INC) mpf_relerr.c -o mpf_relerr $(GMP_LIB)
 	$(CC) $(GMP_INC) mpz_input_nextprime.c -o mpz_input_nextprime $(GMP_LIB)
 	$(CC) $(GMP_INC) mpz_prime_factorization.c -o mpz_prime_factorization $(GMP_LIB)
@@ -73,7 +74,6 @@ mpn_mul_n_benchmark: mpn_mul_n_benchmark.c
 
 gmp_class: mpf_template.cpp mpz_test.cpp mpz_mersenne.cpp mpz_input_nextprime.cpp mpz_prime_factorization.cpp mpz_input_gcd_lcm.cpp mpq_test.cpp
 	$(CPP) $(GMP_INC) mpf_template.cpp -o mpf_template_cxx $(GMPXX_LIB)
-	$(CPP) $(GMP_INC) mpf_template2.cpp -o mpf_template2_cxx $(GMPXX_LIB)
 	$(CPP) $(GMP_INC) mpz_mersenne.cpp -o mpz_mersenne_cxx $(GMPXX_LIB)
 	$(CPP) $(GMP_INC) mpz_input_nextprime.cpp -o mpz_input_nextprime_cxx $(GMPXX_LIB)
 	$(CPP) $(GMP_INC) mpz_prime_factorization.cpp -o mpz_prime_factorization_cxx $(GMPXX_LIB)
@@ -81,14 +81,11 @@ gmp_class: mpf_template.cpp mpz_test.cpp mpz_mersenne.cpp mpz_input_nextprime.cp
 	$(CPP) $(GMP_INC) mpq_test.cpp -o mpq_test_cxx $(GMPXX_LIB)
 	$(CPP) $(GMP_INC) mpz_test.cpp -o mpz_test_cxx $(GMPXX_LIB)
 
-mpfr: mpfr_template.c mpfr_template.cpp mpfr_template1.cpp mpfr_newton_inverse.c mpfr_newton_sqrt.c mpfr_pi.c mpfr_exp.c  mpfr_printf.c mpfr_dec2bin.c mpfr_relerr.c mpfr_relerr.cpp
+mpfr: mpfr_template.c mpfr_template.cpp mpfr_newton_inverse.c mpfr_newton_sqrt.c mpfr_pi_simple.c mpfr_exp.c  mpfr_printf.c mpfr_dec2bin.c mpfr_relerr.c mpfr_relerr.cpp
 	$(CC) $(MPFR_INC) mpfr_template.c -o mpfr_template $(MPFR_LIB)
-	$(CC) $(MPFR_INC) mpfr_template1.c -o mpfr_template1 $(MPFR_LIB)
 	$(CPP) $(MPFR_INC) mpfr_template.cpp -o mpfr_template_cxx $(MPFR_LIB)
-	$(CPP) $(MPFR_INC) mpfr_template1.cpp -o mpfr_template1_cxx $(MPFR_LIB)
 	$(CC) $(MPFR_INC) mpfr_newton_inverse.c -o mpfr_newton_inverse $(MPFR_LIB)
 	$(CC) $(MPFR_INC) mpfr_newton_sqrt.c -o mpfr_newton_sqrt $(MPFR_LIB)
-	$(CC) $(MPFR_INC) mpfr_pi.c -o mpfr_pi $(MPFR_LIB)
 	$(CC) $(MPFR_INC) mpfr_pi_simple.c -o mpfr_pi_simple $(MPFR_LIB)
 	$(CC) $(MPFR_INC) mpfr_exp.c -o mpfr_exp $(MPFR_LIB)
 	$(CC) $(MPFR_INC) mpfr_printf.c -o mpfr_printf $(MPFR_LIB)
