@@ -1,31 +1,47 @@
+//******************************************************************************
+// complex_d.cpp : Test program of double complex
+// Copyright (C) 2019 Tomonori Kouya
+// 
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Lesser General Public License as published by the
+// Free Software Foundation, either version 3 of the License or any later
+// version.
+// 
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+// for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//******************************************************************************
 #include <iostream>
 #include <complex>
 
-// 名前空間はstdを使用
 using namespace std;
 
 int main(int argc, char* argv[])
 {
-	// 実部・虚部共にdouble型とする
+	// double precision complex
   	complex<double> a, b;
 
-	// a, bを標準入力(キーボード)から取り入れる
-	// 入力時は"(実数部,虚数部)"と指定すること！
+	// input a and b from standard input
+	// ex : "(real_part, imag_part)"
 	cout << "Input a ->";
 	cin >> a;
 	cout << "Input b ->";
   	cin >> b;
 
-	// a, bを実数部，虚数部に分けて表示
+	// print a and b
 	cout << "a = " << a.real() << " + " << a.imag() << " * I" << endl;
 	cout << "b = " << b.real() << " + " << b.imag() << " * I" << endl;
 
-	// 標準出力に四則演算の結果を表示
+	// output a + b, a - b, a * b, and a / b
 	cout << a << " + " << b << " = " << a + b << endl;
   	cout << a << " - " << b << " = " << a - b << endl;
   	cout << a << " * " << b << " = " << a * b << endl;
   	cout << a << " / " << b << " = " << a / b << endl;
 
-	// 終了
 	return 0;
 }
