@@ -1,5 +1,5 @@
 //******************************************************************************
-// logistic.c : Sequence calculation based on logistic map
+// logistic_mpreal.cpp : Sequence calculation based on logistic map with mpreal
 // Copyright (C) 2019 Tomonori Kouya
 // 
 // This program is free software: you can redistribute it and/or modify it
@@ -19,7 +19,7 @@
 #include <iostream>
 #include <iomanip>
 
-// MPFR/GMPを用いた多倍長浮動小数点演算クラス
+// mpreal class
 #include "mpreal.h"
 
 using namespace std;
@@ -30,14 +30,14 @@ int main(int argc, char *argv[])
 	int i;
 	int num_bits, num_decimal;
 
-	// 引数チェック
+	// Check arguments
 	if(argc <= 1)
 	{
 		cerr << "Usage: " << argv[0] << " [num_bits]" << endl;
 		return 0;
 	}
 
-	// 計算桁数設定
+	// Set default prec in bits
 	num_bits = atoi(argv[1]);
 	if(num_bits <= 24)
 		num_bits = 24;
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 
 	mpreal x[102];
 
-	// 初期値
+	// Set an initial value
 	x[0] = "0.7501";
 
 	for(i = 0; i <= 100; i++)
