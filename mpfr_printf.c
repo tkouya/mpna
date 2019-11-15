@@ -1,5 +1,5 @@
 //******************************************************************************
-// mpfr_printf.cpp : Test program to show how to use mpfr_printf
+// mpfr_printf.c : Test program to show how to use mpfr_printf
 // Copyright (C) 2019 Tomonori Kouya
 // 
 // This program is free software: you can redistribute it and/or modify it
