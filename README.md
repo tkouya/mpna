@@ -1,2 +1,11 @@
-# mpna
-Introduction to Multiple Precision Numerical Computation with MPFR/GMP and QD
+Sample Programs 
+for "Multiple Precision Numerical Computation with GNU MP, MPFR, and QD"
+============================================================
+
+2019-11-19 (Fri) Tomonori Kouya
+---------------------------------
+
+The following programs are published for all readers of 
+"Multiple Precision Numerical Computation with GNU MP, MPFR, and QD" written in JAPANESE.
+You can read "README.ja.md"(Japanese!) if you want to get detailed description about them.
+
