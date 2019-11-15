@@ -1,12 +1,25 @@
-/*************************************************/
-/* matmul_block.cc : 実行列×実行列
-/* [Intel] icpc matmul.cc
-/* [GCC  ] g++ matmul.cc
-/*************************************************/
+//******************************************************************************
+// matmul_block.cpp : Matrix multiplication with blocking, Strassen algorithm
+//                                                    and OpenMP parallelization
+// Copyright (C) 2019 Tomonori Kouya
+// 
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Lesser General Public License as published by the
+// Free Software Foundation, either version 3 of the License or any later
+// version.
+// 
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+// for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// 
+//******************************************************************************
 #include <iostream>
 #include <iomanip>
 #include <cstdio>
-#include <cstdlib>
 #include <cmath>
 
 #ifdef _OPENMP
@@ -632,7 +645,9 @@ void mul_dmatrix_block(DMatrix ret, DMatrix mat_a, DMatrix mat_b, long int min_d
 	mat_b_index = (long int **)calloc(max_num_div, sizeof(long int *));
 	ret_index = (long int **)calloc(max_num_div, sizeof(long int *));
 
+	#ifdef _OPENMP
 	#pragma omp parallel for
+	#endif // _OPENMP
 	for(i = 0; i < max_num_div; i++)
 	{
 		mat_a_index[i] = (long int *)calloc(4, sizeof(long int));
@@ -645,11 +660,15 @@ void mul_dmatrix_block(DMatrix ret, DMatrix mat_a, DMatrix mat_b, long int min_d
 	small_mat_b = (DMatrix *)calloc(sizeof(DMatrix), num_div_mid);
 	small_tmp_mat = (DMatrix *)calloc(sizeof(DMatrix), num_div_mid);
 
+	#ifdef _OPENMP
 	#pragma omp parallel for
+	#endif // _OPENMP
 	for(i = 0; i < num_div_col; i++)
 		small_ret[i] = init_dmatrix(min_dim, min_dim);
 
+	#ifdef _OPENMP
 	#pragma omp parallel for
+	#endif // _OPENMP
 	for(i = 0; i < num_div_mid; i++)
 	{
 		small_mat_a[i] = init_dmatrix(min_dim, min_dim);
@@ -676,7 +695,9 @@ void mul_dmatrix_block(DMatrix ret, DMatrix mat_a, DMatrix mat_b, long int min_d
 	// mail loop
 	for(i = 0; i < num_div_row; i++)
 	{
+		#ifdef _OPENMP
 		#pragma omp parallel for
+		#endif // _OPENMP
 		for(j = 0; j < num_div_mid; j++)
 		{
 			// copy matrices
@@ -691,7 +712,9 @@ void mul_dmatrix_block(DMatrix ret, DMatrix mat_a, DMatrix mat_b, long int min_d
 		{
 			set0_dmatrix(small_ret[j]);
 
+			#ifdef _OPENMP
 			#pragma omp parallel for
+			#endif // _OPENMP
 			for(k = 0; k < num_div_mid; k++)
 			{
 				// copy matrices
@@ -717,7 +740,9 @@ void mul_dmatrix_block(DMatrix ret, DMatrix mat_a, DMatrix mat_b, long int min_d
 		}
 	}
 
+	#ifdef _OPENMP
 	#pragma omp parallel for
+	#endif // _OPENMP
 	for(i = 0; i < max_num_div; i++)
 	{
 		free(mat_a_index[i]);
@@ -728,11 +753,15 @@ void mul_dmatrix_block(DMatrix ret, DMatrix mat_a, DMatrix mat_b, long int min_d
 	free(mat_b_index);
 	free(ret_index);
 
+	#ifdef _OPENMP
 	#pragma omp parallel for
+	#endif // _OPENMP
 	for(i = 0; i < num_div_col; i++)
 		free_dmatrix(small_ret[i]);
 
+	#ifdef _OPENMP
 	#pragma omp parallel for
+	#endif // _OPENMP
 	for(i = 0; i < num_div_mid; i++)
 	{
 		free_dmatrix(small_mat_a[i]);
@@ -751,10 +780,6 @@ int main(int argc, char *argv[])
 	int i, j, min_dim, max_dim, dim, iter, max_iter = 10, block_size, num_threads;
 	DMatrix mat_a, mat_b, mat_c;
 	double stime, etime, mat_c_normf;
-
-	// 次元数入力
-//	cout << "DIM = ";
-//	cin >> dim;
 
 #if defined(BLOCK) || defined(STRASSEN)
 	if(argc < 3)
@@ -793,39 +818,39 @@ int main(int argc, char *argv[])
 
 #ifdef STRASSEN
 	cout << "Use STRASSEN algorithm" << endl;
-	cout << setw(5) << "  dim :     SECONDS Mat.KB" << endl;
+	cout << setw(5) << "  dim :     SECONDS Mat.KB ||C||_F" << endl;
 #elif BLOCK // STRASSEN
 	cout << "Use Block algorithm" << endl;
-	cout << setw(5) << "  dim :     SECONDS GFLOPS Mat.KB" << endl;
+	cout << setw(5) << "  dim :     SECONDS GFLOPS Mat.KB ||C||_F" << endl;
 #else // STRASSEN
 	cout << "Use Simple algorithm" << endl;
-	cout << setw(5) << "  dim :     SECONDS GFLOPS Mat.KB" << endl;
+	cout << setw(5) << "  dim :     SECONDS GFLOPS Mat.KB ||C||_F" << endl;
 #endif // STRASSEN
 
-	// mainloop
+	// main loop
 	//for(dim = min_dim; dim <= max_dim; dim += 128)
 	for(dim = min_dim; dim <= max_dim; dim += 16)
 	{
 
-		// 変数初期化
+		// initialize matrices
 		//mat_a = new double[dim * dim];
 		mat_a = init_dmatrix(dim, dim);
 		mat_b = init_dmatrix(dim, dim);
 		mat_c = init_dmatrix(dim, dim);
 
-		// mat_aとmat_bに値入力
+		// set mat_a and mat_b
 		for(i = 0; i < dim; i++)
 		{
 			for(j = 0; j < dim; j++)
 			{
-			//	mat_a->element[i * dim + j] = sqrt(5.0) * (double)(i + j + 1);
-			//	mat_b->element[i * dim + j] = sqrt(3.0) * (double)(dim - (i + j));
-				mat_a->element[i * dim + j] = 1.0 / (double)(i + j + 1);
-				mat_b->element[i * dim + j] = (double)(i + j + 1);
+				mat_a->element[i * dim + j] = sqrt(5.0) * (double)(i + j + 1);
+				mat_b->element[i * dim + j] = sqrt(3.0) * (double)(dim - (i + j));
+			//	mat_a->element[i * dim + j] = 1.0 / (double)(i + j + 1);
+			//	mat_b->element[i * dim + j] = (double)(i + j + 1);
 			}
 		}
 
-		// 行列×行列
+		// matrix multiplication
 		max_iter = 3;
 		do
 		{
@@ -850,11 +875,7 @@ int main(int argc, char *argv[])
 		etime /= (double)max_iter;
 		mat_c_normf = normf_dmatrix(mat_c);
  
-		// 出力
-		//cout << "Dimension     : " << dim << " * " << dim << endl;
-		//cout << "Comp.Time(sec): " << setprecision(3) << etime << endl;
-		//cout << "Gflops        : " << setprecision(3) << matvec_mul_gflops(etime, dim) << endl;
-//		cout << setw(5) << dim << " : " << setw(10) << setprecision(5) << matmul_gflops(etime, dim) << " " << byte_double_sqmat(dim) / 1024 << endl;
+		// output
 #ifdef STRASSEN
 		cout << setw(5) << dim << " : " << setw(10) << setprecision(5) << etime << " " << byte_double_sqmat(dim) / 1024 << " " << mat_c_normf << endl;
 #else // STRASSEN
@@ -871,13 +892,13 @@ int main(int argc, char *argv[])
 		}
 		*/
 
-		// 変数消去
+		// delete matrices
 		//delete mat_a;
 		free_dmatrix(mat_a);
 		free_dmatrix(mat_b);
 		free_dmatrix(mat_c);
 
-	} // end of mainloop
+	} // end of main loop
 
 	return EXIT_SUCCESS;
 }
