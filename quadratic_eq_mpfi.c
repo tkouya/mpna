@@ -1,5 +1,5 @@
 //******************************************************************************
-// quadratic_eq_mpfi.cpp : Quadratic Equation Solver with MPFI
+// quadratic_eq_mpfi.cpp : Algebraic quadratic equation solver with MPFI
 // Copyright (C) 2019 Tomonori Kouya
 // 
 // This program is free software: you can redistribute it and/or modify it
