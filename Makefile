@@ -165,7 +165,6 @@ clean:
 	-rm mpfr_template1_cxx
 	-rm mpfr_newton_inverse
 	-rm mpfr_newton_sqrt
-	-rm mpfr_pi
 	-rm mpfr_pi_simple
 	-rm mpfr_exp
 	-rm mpfr_printf
@@ -227,9 +226,9 @@ clean:
 	-rm cg_double
 	-rm mpz_input_gcd_lcm
 	-rm cg_d_omp
-	-rm mpq_input $(GMP_LIB)
-	-rm cg_mpfr get_sec.cpp
-	-rm mpq_input_convert 
+	-rm mpq_input
+	-rm cg_mpfr
+	-rm mpq_input_convert
 	-rm cg_mpfr_omp
 	-rm cg_d_cxx
 	-rm cg_dd_cxx

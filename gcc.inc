@@ -22,7 +22,7 @@ LAPACKE_LIB = -L/usr/local/lib -llapacke -llapack $(CBLAS_LIB)
 OPENMP = -fopenmp
 OPENMP_LIB = -lgomp
 
-all: quadratic_eq get_sec matmul cg iterative_ref mpfr qd lu gcc_float128 gmp
+all: quadratic_eq get_sec matmul cg iterative_ref mpfr qd lu gcc_float128 gmp rsa
 
 # GCC Quadruple precision library (__float128, __complex128)
 gcc_float128: float128.c complex128.c
