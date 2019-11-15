@@ -1,9 +1,21 @@
-/**********************************************************/
-/* Power Method with mpreal/MPFR/GMP                      */
-/*                                                        */
-/* Copyright (c) 2016 Tomonori Kouya, All rights reserved */
-/* Version 0.0: 2016-12-20 (Tue) First published          */
-/**********************************************************/
+//******************************************************************************
+// cond_mpreal_hilbert.cpp : Calculation of condition number of Hilbert matrix
+// Copyright (C) 2019 Tomonori Kouya
+// 
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Lesser General Public License as published by the
+// Free Software Foundation, either version 3 of the License or any later
+// version.
+// 
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+// for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// 
+//******************************************************************************
 #include <iostream>
 #include <iomanip>
 
