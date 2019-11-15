@@ -1,5 +1,21 @@
-// logistic é ëú
-// MPFRî≈
+//******************************************************************************
+// logistic_mpfr.c : Logistic function with MPFR
+// Copyright (C) 2019 Tomonori Kouya
+// 
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Lesser General Public License as published by the
+// Free Software Foundation, either version 3 of the License or any later
+// version.
+// 
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+// for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// 
+//******************************************************************************
 #include <stdio.h>
 #include "mpfr.h"
 
@@ -17,7 +33,7 @@ int main()
 	printf("prec(bits) = "); scanf("%ld", &prec);
 	mpfr_set_default_prec(prec);
 
-	// èâä˙âª
+	// Initialize mpfr array
 	mpfr_init(relerr);
 	for(i = 0; i < MAX_NUM; i++)
 	{
@@ -25,7 +41,6 @@ int main()
 		mpfr_init2(lx[i], prec * 2);
 	}
 
-	// èâä˙íl
 	//x[0] = 0.7501;
 	mpfr_set_str(x[0], "0.7501", 10, MPFR_RNDN);
 	mpfr_set_str(lx[0], "0.7501", 10, MPFR_RNDN);
@@ -53,7 +68,7 @@ int main()
 
 	}
 
-	// è¡ãé
+	// delete variables
 	mpfr_clear(relerr);
 	for(i = 0; i < MAX_NUM; i++)
 	{

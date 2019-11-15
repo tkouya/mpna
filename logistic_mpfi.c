@@ -1,5 +1,21 @@
-// logistic ŽÊ‘œ
-// MPFR & MPFI”Å
+//******************************************************************************
+// logistic_mpfi.c : logistic map with MPFI
+// Copyright (C) 2019 Tomonori Kouya
+// 
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Lesser General Public License as published by the
+// Free Software Foundation, either version 3 of the License or any later
+// version.
+// 
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+// for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//******************************************************************************
 #include <stdio.h>
 #include "mpfr.h"
 #include "mpfi.h"
@@ -13,15 +29,15 @@ int main()
 	mpfi_t x[MAX_NUM];
 	mpfr_t relerr;
 
-	printf("prec(bits) = "); scanf("%ld", &prec);
+	printf("prec(bits) = "); while(scanf("%ld", &prec) < 1);
 	mpfr_set_default_prec(prec);
 
-	// ‰Šú‰»
+	// initialize variables
 	mpfr_init(relerr);
 	for(i = 0; i < MAX_NUM; i++)
 		mpfi_init(x[i]);
 
-	// ‰Šú’l
+	// set a initial interval
 	mpfi_set_str(x[0], "0.7501", 10);
 
 	for(i = 0; i <= 100; i++)
@@ -41,7 +57,7 @@ int main()
 
 	}
 
-	// Á‹Ž
+	// delete variables
 	mpfr_clear(relerr);
 	for(i = 0; i < MAX_NUM; i++)
 		mpfi_clear(x[i]);
