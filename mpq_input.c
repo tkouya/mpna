@@ -1,6 +1,5 @@
 //******************************************************************************
-// mpq_test.c : Sample code of multiple precision rational numbers
-// integers
+// mpq_test.c : Input multiple precision rational numbers
 // Copyright (C) 2019 Tomonori Kouya
 // 
 // This program is free software: you can redistribute it and/or modify it
