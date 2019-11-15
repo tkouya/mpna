@@ -30,8 +30,7 @@ using namespace std;
 using namespace mpfr;
 
 // Template linear compucation with double, QD, MPFR/GMP
-//#include "template_linear.h"
-#include "template_linear_power.h"
+#include "template_linear.h"
 
 // Time routines
 #include "get_secv.h"

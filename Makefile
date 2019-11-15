@@ -135,11 +135,8 @@ lu: lu_d.c template_lu_dd.cpp template_lu.cpp template_lu_qd.cpp template_lu_mpr
 	$(CPP) $(QD_INC) template_lu_qd.cpp get_sec.o -o lu_qd $(QD_LIB)
 	$(CPP) $(MPFR_INC) template_lu_mpreal.cpp get_sec.o -o lu_mpreal $(MPFR_LIB)
 
-power: power_mpreal.cpp power_d.cpp power_mpreal_hilbert.cpp cond_mpreal_hilbert.cpp
-	$(CPP) $(MPFR_INC) power_d.cpp get_sec.o -o power_d $(MPFR_LIB)
-	$(CPP) $(QD_INC) power_dd.cpp get_sec.o -o power_dd $(QD_LIB)
-	$(CPP) $(QD_INC) power_qd.cpp get_sec.o -o power_qd $(QD_LIB)
-	$(CPP) $(MPFR_INC) power_mpreal.cpp get_sec.o -o power_mpreal $(MPFR_LIB)
+power: power_mpreal_hilbert.cpp cond_mpreal_hilbert.cpp
+	$(CPP) $(MPFR_INC) power_mpreal_hilbert.cpp get_sec.o -o power_mpreal_hilbert $(MPFR_LIB)
 	$(CPP) $(MPFR_INC) inverse_power_mpreal_hilbert.cpp get_sec.o -o inverse_power_mpreal_hilbert $(MPFR_LIB)
 	$(CPP) $(MPFR_INC) cond_mpreal_hilbert.cpp get_sec.o -o cond_mpreal_hilbert $(MPFR_LIB)
 
@@ -162,7 +159,6 @@ clean:
 	-rm mpfr_template
 	-rm mpfr_template1
 	-rm mpfr_template_cxx
-	-rm mpfr_template1_cxx
 	-rm mpfr_newton_inverse
 	-rm mpfr_newton_sqrt
 	-rm mpfr_pi_simple
@@ -192,17 +188,16 @@ clean:
 	-rm matmul_winograd
 	-rm cg_mpfr_omp
 	-rm mpn_test
-	-rm mpn_sample
+	-rm mpn_sample_full
+	-rm mpz_test
 	-rm mpz_mersenne
 	-rm mpz_mersenne_cxx
 	-rm mpz_factorial
+	-rm mpz_input
+	-rm mpz_input_str
 	-rm mpq_input
 	-rm mpfr_pi_simple
-	-rm mpn_sample_full
-	-rm sample_linear_cxx
-	-rm mpz_input_str
 	-rm template_complex
-	-rm mpz_input
 	-rm template_complex_efunc
 	-rm mpz_mersenne
 	-rm test_mpc
@@ -235,13 +230,11 @@ clean:
 	-rm cg_qd_cxx
 	-rm cg_mpreal_cxx
 	-rm lu_d
+	-rm lu_d_cxx
 	-rm lu_dd
 	-rm lu_qd
 	-rm lu_mpreal
-	-rm power_d
-	-rm power_dd
-	-rm power_qd
-	-rm power_mpreal
+	-rm power_mpreal_hilbert
 	-rm inverse_power_mpreal_hilbert
 	-rm cond_mpreal_hilbert
 	-rm test_iterative_ref_mpreal

@@ -23,4 +23,4 @@ LAPACKE_LIB = $(CBLAS_LIB)
 OPENMP = -openmp
 OPENMP_LIB =
 
-all: quadratic_eq get_sec num_size matmul cg iterative_ref gmp rsa
+all: quadratic_eq get_sec num_size matmul cg iterative_ref gmp rsa power
