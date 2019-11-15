@@ -1,3 +1,21 @@
+//******************************************************************************
+// mpfr_newton.c : Newton method with MPFR
+// Copyright (C) 2019 Tomonori Kouya
+// 
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Lesser General Public License as published by the
+// Free Software Foundation, either version 3 of the License or any later
+// version.
+// 
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+// for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// 
+//******************************************************************************
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -9,7 +27,10 @@
 void mpfr_func(mpfr_t ret, mpfr_t x, mpfr_rnd_t rmode)
 {
 	// ret := x - cos(x)
-	mpfr_cos(ret, x, rmode); mpfr_sub(ret, x, ret, rmode);
+	//mpfr_cos(ret, x, rmode); mpfr_sub(ret, x, ret, rmode);
+
+	// ret := 1 - a * x
+	mpfr_mul_ui(ret, x, 7UL, rmode); mpfr_ui_sub(ret, 1UL, ret, rmode);
 
 	// ret := x^2 - a
 	//mpfr_sqr(ret, x, rmode); mpfr_sub_ui(ret, ret, 2, rmode);
@@ -19,7 +40,10 @@ void mpfr_func(mpfr_t ret, mpfr_t x, mpfr_rnd_t rmode)
 void mpfr_dfunc(mpfr_t ret, mpfr_t x, mpfr_rnd_t rmode)
 {
 	// ret := 1 + sin(x)
-	mpfr_sin(ret, x, rmode); mpfr_add_ui(ret, ret, 1UL, rmode);
+	//mpfr_sin(ret, x, rmode); mpfr_add_ui(ret, ret, 1UL, rmode);
+
+	// ret := -a
+	mpfr_set_ui(ret, 7UL, rmode); mpfr_neg(ret, ret, rmode);
 
 	// ret := 2 * x
 	//mpfr_mul_ui(ret, x, 2UL, rmode);
@@ -44,16 +68,16 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	old_prec = 2; // 1bit
+	mpfr_set_default_prec(max_prec);
 
-	mpfr_init2(old_x, old_prec);
-	mpfr_init2(new_x, old_prec);
-	mpfr_init2(func_x, old_prec);
-	mpfr_init2(dfunc_x, old_prec);
-	mpfr_init2(relerr, max_prec);
+	mpfr_init(old_x);
+	mpfr_init(new_x);
+	mpfr_init(func_x);
+	mpfr_init(dfunc_x);
+	mpfr_init(relerr);
 
-	mpfr_set_ui(old_x, 1UL, MPFR_RNDN);
-	//mpfr_set_d(old_x, 0.9, MPFR_RNDN);
+	//mpfr_set_ui(old_x, 1UL, MPFR_RNDN);
+	mpfr_set_d(old_x, 7.0, MPFR_RNDN);
 	//mpfr_set_d(old_x, 0.3, MPFR_RNDN);
 
 	// newton iteration
@@ -69,31 +93,8 @@ int main(int argc, char *argv[])
 		// detect precision
 		
 		mpfr_reldiff(relerr, new_x, old_x, MPFR_RNDN);
-		//mpfr_printf("relerr = %RNe\n", relerr);
-/*		if(mpfr_cmp_ui(relerr, 0UL) > 0)
-		{
-			mpfr_log10(relerr, relerr, MPFR_RNDN);
-			new_prec = (mp_bitcnt_t)ceil(-mpfr_get_d(relerr, MPFR_RNDN) / log10(2.0));
-			mpfr_printf("new_prec = %ld, relerr = %RNe\n", new_prec, relerr);
-		}
-		else
-			new_prec = max_prec;
-*/
-		new_prec = 2 * old_prec;
 
 		mpfr_printf("%3d %10.3RNe %50.43RNe\n", itimes, relerr, new_x);
-
-		// reset prec
-//		if(old_prec >= max_prec)
-//			break;
-
-		printf("old_prec -> new_prec : max_prec= %ld -> %ld: %ld\n", old_prec, new_prec, max_prec);
-
-		mpfr_prec_round(new_x, new_prec, MPFR_RNDN);
-		mpfr_prec_round(old_x, new_prec, MPFR_RNDN);
-		mpfr_prec_round(func_x, new_prec, MPFR_RNDN);
-		mpfr_prec_round(dfunc_x, new_prec, MPFR_RNDN);
-		old_prec = new_prec;
 
 		// old_x := new_x
 		mpfr_set(old_x, new_x, MPFR_RNDN);
