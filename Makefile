@@ -3,10 +3,10 @@
 # ----- Copyright (c) 2019 Tomonori Kouya
 # ------------------------------------------------
 # GCC
-include gcc.inc
+#include gcc.inc
 
 # Intel C/C++
-#include icc.inc
+include icc.inc
 
 GMP_INC = $(INC)
 GMP_LIB =  -lgmp $(LIB)
@@ -240,3 +240,5 @@ clean:
 	-rm test_iterative_ref_mpreal
 	-rm test_iterative_ref_dd
 	-rm test_iterative_ref_qd
+	-rm sample_linear
+	-rm sample_linear_cxx
