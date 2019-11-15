@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 	int i;
 	int num_bits, num_decimal;
 
-	// 引数チェック
+	// Check arguments
 	if(argc <= 1)
 	{
 		cerr << "Usage: " << argv[0] << " [num_bits]" << endl;
