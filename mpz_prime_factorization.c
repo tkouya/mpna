@@ -1,5 +1,5 @@
 //******************************************************************************
-// mpz_factorization.c : Factorization of multiple precision integer
+// mpz_prime_factorization.c : Factorization of multiple precision integer
 // Copyright (C) 2019 Tomonori Kouya
 // 
 // This program is free software: you can redistribute it and/or modify it
