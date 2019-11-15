@@ -1,12 +1,24 @@
-/*************************************************/
-/* matmul_block.cc : 実行列×実行列
-/* [Intel] icpc matmul.cc
-/* [GCC  ] g++ matmul.cc
-/*************************************************/
+//******************************************************************************
+// matmul_winograd.cpp : Matrix multiprication based on Winograd algorithm
+// Copyright (C) 2019 Tomonori Kouya
+// 
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Lesser General Public License as published by the
+// Free Software Foundation, either version 3 of the License or any later
+// version.
+// 
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+// for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// 
+//******************************************************************************
 #include <iostream>
 #include <iomanip>
 #include <cstdio>
-#include <cstdlib>
 #include <cmath>
 
 #include "matmul_block.h"
@@ -503,21 +515,10 @@ int main(int argc, char *argv[])
 	DMatrix mat_a, mat_b, mat_c;
 	double stime, etime, mat_c_normf;
 
-#ifdef _OPENMP
-	cout << "num_threads: ";
-	cin >> num_threads;
-
-	omp_set_num_threads(num_threads);
-#endif // _OPENMP
-
-	// 次元数入力
-//	cout << "DIM = ";
-//	cin >> dim;
-
 	if(argc < 3)
 	{
 		cout << "Usage: " << argv[0] << " [min. dimension]  [max.dimension]  [block_size]"<< endl;
-		return EXIT_SUCCESS;
+		return 0;
 	}
 
 	min_dim = atoi(argv[1]);
@@ -527,48 +528,45 @@ int main(int argc, char *argv[])
 	if(min_dim <= 0)
 	{
 		cout << "Illegal dimension! (min_dim = " << min_dim << ")" << endl;
-		return EXIT_FAILURE;
+		return 1;
 }
 
 	cout << "Use WINOGRAD algorithm" << endl;
-	cout << setw(5) << "  dim :     SECONDS Mat.KB" << endl;
+	cout << setw(5) << "  dim :     SECONDS Mat.KB ||C||_F" << endl;
 
-	// mainloop
+	// main loop
 	//for(dim = min_dim; dim <= max_dim; dim += 128)
 	for(dim = min_dim; dim <= max_dim; dim += 16)
 	{
 
-		// 変数初期化
+		// initialize matrices
 		//mat_a = new double[dim * dim];
 		mat_a = init_dmatrix(dim, dim);
 		mat_b = init_dmatrix(dim, dim);
 		mat_c = init_dmatrix(dim, dim);
 
-		// mat_aとmat_bに値入力
+		// set mat_a and mat_b
 		for(i = 0; i < dim; i++)
 		{
 			for(j = 0; j < dim; j++)
 			{
-				mat_a->element[i * dim + j] = (double)(i + j + 1);
-			//	if((i + j + 1) % 2 != 0)
-			//		mat_a->element[i * dim + j] *= -1.0;
-
-				mat_b->element[i * dim + j] = (double)(i + j + 1);
-			//	if((i + j + 1) % 2 != 0)
-			//		mat_b->element[i * dim + j] *= -1.0;
+				mat_a->element[i * dim + j] = sqrt(5.0) * (double)(i + j + 1);
+				mat_b->element[i * dim + j] = sqrt(3.0) * (double)(dim - (i + j));
+			//	mat_a->element[i * dim + j] = 1.0 / (double)(i + j + 1);
+			//	mat_b->element[i * dim + j] = (double)(i + j + 1);
 			}
 		}
 
-		// 行列×行列
+		// matrix multiplication
 		max_iter = 3;
 		do
 		{
-			stime = get_secv();
+			stime = get_real_secv();
 
 			for(iter = 0; iter < max_iter; iter++)
 				mul_dmatrix_winograd(mat_c, mat_a, mat_b, block_size);
 
-			etime = get_secv(); etime -= stime;
+			etime = get_real_secv(); etime -= stime;
 
 			if(etime >= 1.0) break;
 			max_iter *= 2;
@@ -577,11 +575,7 @@ int main(int argc, char *argv[])
 		etime /= (double)max_iter;
 		mat_c_normf = normf_dmatrix(mat_c);
  
-		// 出力
-		//cout << "Dimension     : " << dim << " * " << dim << endl;
-		//cout << "Comp.Time(sec): " << setprecision(3) << etime << endl;
-		//cout << "Gflops        : " << setprecision(3) << matvec_mul_gflops(etime, dim) << endl;
-//		cout << setw(5) << dim << " : " << setw(10) << setprecision(5) << matmul_gflops(etime, dim) << " " << byte_double_sqmat(dim) / 1024 << endl;
+		// output
 		cout << setw(5) << dim << " : " << setw(10) << setprecision(5) << etime << " " << byte_double_sqmat(dim) / 1024 << " " << mat_c_normf << endl;
 
 		/*
@@ -594,13 +588,13 @@ int main(int argc, char *argv[])
 		}
 		*/
 
-		// 変数消去
+		// delete matrices
 		//delete mat_a;
 		free_dmatrix(mat_a);
 		free_dmatrix(mat_b);
 		free_dmatrix(mat_c);
 
-	} // end of mainloop
+	} // end of main loop
 
-	return EXIT_SUCCESS;
+	return 0;
 }
