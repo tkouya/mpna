@@ -1,4 +1,21 @@
-// logistic é ëú
+//******************************************************************************
+// logistic_mpreal_dd_qd.cpp : Sequence calculation based on logistic map 
+// Copyright (C) 2019 Tomonori Kouya
+// 
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Lesser General Public License as published by the
+// Free Software Foundation, either version 3 of the License or any later
+// version.
+// 
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+// for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// 
+//******************************************************************************
 #include <iostream>
 #include <iomanip>
 
@@ -11,8 +28,8 @@
 using namespace std;
 using namespace mpfr;
 
-// mpfr_dd_qd.c
-#include "mpfr_dd_qd.c"
+// mpfr_[set,get]_[dd,qd]
+#include "mpfr_dd_qd.h"
 
 
 int main(int argc, char *argv[])
@@ -27,7 +44,7 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	// åvéZåÖêîê›íË
+	// set default precision
 	num_bits = atoi(argv[1]);
 	if(num_bits <= 24)
 		num_bits = 24;
@@ -43,14 +60,14 @@ int main(int argc, char *argv[])
 	mpreal long_x[102]; // longer
 	double mpfr_dd[2], mpfr_qd[4];
 
-	// 2î{ÇÃåÖêîÇ≈èâä˙âª
+	// initialize as twice precision
 	for(i = 0; i < 102; i++)
 		long_x[i].set_prec(num_bits * 2);
 
 	// fix FPU mode for QD
 	fpu_fix_start(NULL);
 
-	// èâä˙íl
+	// set initial values
 	x[0] = "0.7501";
 	dd_x[0] = "0.7501";
 	qd_x[0] = "0.7501";
