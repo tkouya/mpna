@@ -3,10 +3,10 @@
 # ----- Copyright (c) 2019 Tomonori Kouya
 # ------------------------------------------------
 # GCC
-#include gcc.inc
+include gcc.inc
 
 # Intel C/C++
-include icc.inc
+#include icc.inc
 
 GMP_INC = $(INC)
 GMP_LIB =  -lgmp $(LIB)
