@@ -1,6 +1,6 @@
 # ------------------------------------------------
 # ----- Makefile for "Multiple Precision Numerical Computation"
-# ----- Copyright (c) 2019 Tomonori Kouya
+# ----- Copyright (c) 2020 Tomonori Kouya
 # ------------------------------------------------
 # GCC
 include gcc.inc
@@ -45,7 +45,7 @@ logistic: logistic_f.c logistic.c logistic_dd.cpp logistic_qd.cpp logistic_mprea
 get_sec: get_sec.cpp get_secv.h
 	$(CPP) -c get_sec.cpp -o get_sec.o
 
-gmp: mpn_sample_full.c  mpz_test.c mpz_input.c mpz_mersenne.c mpf_template.c mpz_factorial.c mpz_input_nextprime.c mpz_prime_factorization.c mpz_binomial.c mpz_input_gcd_lcm.c mpf_relerr.c mpq_input.c mpq_input_convert.c
+gmp: mpn_sample_full.c  mpz_test.c mpz_input.c mpz_mersenne.c mpf_template.c mpz_factorial.c mpz_input_nextprime.c mpz_prime_factorization.c mpz_binomial.c mpz_input_gcd_lcm.c mpf_relerr.c mpq_input.c mpq_input_convert.c mpz_prime_factorization_arg.c
 	$(CC) $(GMP_INC) mpn_sample_full.c -o mpn_sample_full $(GMP_LIB)
 	$(CC) $(GMP_INC) -DUSE_STR_INPUT mpz_input.c -o mpz_input_str $(GMP_LIB)
 	$(CC) $(GMP_INC) mpz_test.c -o mpz_test $(GMP_LIB)
@@ -61,6 +61,7 @@ gmp: mpn_sample_full.c  mpz_test.c mpz_input.c mpz_mersenne.c mpf_template.c mpz
 	$(CC) $(GMP_INC) mpz_input_gcd_lcm.c -o mpz_input_gcd_lcm $(GMP_LIB)
 	$(CC) $(GMP_INC) mpq_input.c -o mpq_input $(GMP_LIB)
 	$(CC) $(GMP_INC) mpq_input_convert.c -o mpq_input_convert $(GMP_LIB)
+	$(CC) $(GMP_INC) mpz_prime_factorization_arg.c -o mpz_prime_factorization_arg $(GMP_LIB)
 
 gmp_class: mpf_template.cpp mpz_test.cpp mpz_mersenne.cpp mpz_input_nextprime.cpp mpz_prime_factorization.cpp mpz_input_gcd_lcm.cpp mpq_test.cpp
 	$(CPP) $(GMP_INC) mpf_template.cpp -o mpf_template_cxx $(GMPXX_LIB)
